@@ -41,32 +41,11 @@ def create_excel_file(file_name, ticker):
     except FileNotFoundError:
         wb = xw.Book()
 
-    if 'Bonds data' not in wb.sheet_names:
-        wb.sheets.add('Bonds data')
-
     if ticker not in wb.sheet_names:
         wb.sheets.add(ticker)
 
     wb.save(file_name)
     return wb
-
-
-def get_bonds_data(url):
-    request = requests.get(url).text
-    bonds = bs(request, 'html.parser')
-    table = bonds.find('table', {'class': 'W(100%)'})
-    rows = table.find_all('tr')
-    data = []
-    for row in rows:
-        cols = row.find_all('td')
-        row_data = [col.text for col in cols]
-        data.append(row_data)
-    return data
-
-
-def update_bonds_sheet(bonds_sheet, data):
-    for i, row in enumerate(data):
-        bonds_sheet.range(f'A{1 + i}', f'H{1 + i}').value = row
 
 
 def update_option_sheet(option_sheet, calls, puts, price, expiry_date):
@@ -77,6 +56,8 @@ def update_option_sheet(option_sheet, calls, puts, price, expiry_date):
 
 
 def main():
+    
+    # add your ticker below... I added NFLX  as an example 
     ticker = 'NFLX'
     try:
         #
@@ -84,17 +65,11 @@ def main():
         file_name = f'{ticker}.xlsx'
         wb = create_excel_file(file_name, ticker)
 
-        # Get the bonds data
-        url = 'https://finance.yahoo.com/bonds'
-        bonds_data = get_bonds_data(url)
-
-        # Add the bonds data to the Bonds sheet
-        bonds_sheet = wb.sheets('Bonds data')
-        update_bonds_sheet(bonds_sheet, bonds_data)
-
+       
         # Create the option chain
         while True:
             try:
+                # added time to check the how in much time the data is updatd..
                 initial_time = time.time()
                 option_chain = OptionChain(ticker)
                 expiry = OptionChain(ticker).expiry_date
@@ -104,6 +79,7 @@ def main():
                 # Add the calls and puts data to the Option sheet
                 option_sheet = wb.sheets(ticker)
                 update_option_sheet(option_sheet, calls, puts, option_chain.price, expiry)
+                
                 final_time = time.time()
                 total = final_time - initial_time
                 Ctime = datetime.datetime.now().time()
