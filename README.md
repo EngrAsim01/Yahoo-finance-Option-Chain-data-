@@ -5,12 +5,12 @@ This project is programmed to get the live option chain data for a specific tick
 This script will provide you complete live option chain data for any ticker.. 
 
 # Requirements 
-yfinance 
-xlwings
-bs4 
-requests
-time
-datetime
+- yfinance 
+- xlwings
+- bs4 
+- requests
+- time
+- datetime
 
 
 install the required modules above for the script to work smoothly..
